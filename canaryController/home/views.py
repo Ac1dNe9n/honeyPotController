@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from . import forms
 
 
-# Create your views here.
 
 
 def index(request):
@@ -31,3 +30,10 @@ def login(request):
     else:
         UserLoginForm = forms.UserLoginForm()
         return render(request, 'home/login.html', {'UserLoginForm': UserLoginForm})
+
+
+def logout(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
+    request.session.flush()
+    return redirect("/login/")
