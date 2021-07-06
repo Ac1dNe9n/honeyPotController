@@ -1,7 +1,6 @@
 import requests
 from django.shortcuts import render
-
-from webCanary import forms
+from . import forms
 
 
 def get_ip(request):
@@ -21,7 +20,7 @@ def login(request):
             password = UserLoginForm.cleaned_data.get('password')
             ip = get_ip(request)
             print(ip)
-            url = 'http://10.22.145.106/webHoneyPort/'
+            url = 'http://10.122.196.144/webHoneyPort/'
             data = {'ip': ip, 'username': username, 'password': password, 'potID': 1}
             r = requests.post(url, data)
             print(r.status_code)
