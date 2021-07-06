@@ -29,44 +29,62 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td><span class="badge bg-primary text-white">Web</span>蜜罐1</td>
-                            <td>192.168.0.1</td>
-                            <td>局域网</td>
-                            <td>2018年6月12日14:23</td>
-                            <td data-toggle="modal" data-target="#detail"><span class="badge bg-success text-white">详细</span></td>
-                            <td><i class="fas fa-trash text-danger"></i></td>
-                        </tr>
-
+                        {% for l in log %}
+                            <tr>
+                                <td><span
+                                        class="badge bg-primary text-white">{{ l.honeyPotType }}</span>蜜罐{{ l.honeyPotID }}
+                                </td>
+                                <td>{{ l.ip }}</td>
+                                <td>{{ l.origin }}</td>
+                                <td>{{ l.time }}</td>
+                                <td data-toggle="modal" data-target="#id{{ l.id }}"><span
+                                        class="badge bg-success text-white">查看详细</span>
+                                </td>
+                                <td>
+                                    <form method="post" action="/log/">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="logID" value={{ l.id }}>
+                                        <button type="submit" class="btn-info">删除</button>
+                                        {#                                        <div type="submit">#}
+                                        {#                                            <i class="fas fa-trash text-danger"></i>#}
+                                        {#                                        </div>#}
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
+
+                {% for l in log %}
+                    <div class="modal fade" id="id{{ l.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark">日志详细</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>{{ l.detail }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary">确定</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+
                 {% include 'home/footer.html' %}
             </div>
         </div>
     </div>
 </div>
 
-
-<div class="modal fade" id="detail" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-dark">日志详细</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>123</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="{% static 'thirdpart/jquery/jquery.js' %}"></script>
 <script src="{% static 'thirdpart/popper/popper.js' %}"></script>

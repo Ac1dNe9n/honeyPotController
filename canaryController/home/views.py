@@ -43,15 +43,41 @@ def logout(request):
 
 
 def statistics(request):
-    return render(request, 'home/statistics.html')
+    data = models.ThreatType.objects.all().values_list("num")
+    temp = []
+    for i in data:
+        temp.append(i[0])
+    return render(request, 'home/statistics.html', {'attackData': temp})
 
 
 def source(request):
     return render(request, 'home/source.html')
 
 
+def gethoneyPotType(t):
+    if t == 1:
+        return "Web"
+    elif t == 2:
+        return "SSH"
+    elif t == 3:
+        return "RDP"
+    else:
+        return "Mysql"
+
+
 def log(request):
-    return render(request, 'home/threatLog.html')
+    if request.method == "POST":
+        logForm = forms.deleteForm(request.POST)
+        if logForm.is_valid():
+            logID = logForm.cleaned_data.get('logID')
+            models.Threat.objects.filter(id=logID).delete()
+    data = models.Threat.objects.all().values_list('honeyPotID', 'honeyPotType', 'ip', 'origin', 'time', 'detail', 'id')
+    lg = []
+    for i in data:
+        lg.append({'honeyPotID': i[0], 'honeyPotType': gethoneyPotType(i[1]), 'ip': i[2], 'origin': i[3], 'time': i[4],
+                   'detail': i[5], 'id': i[6]})
+
+    return render(request, 'home/threatLog.html', {'log': lg})
 
 
 def getOrigin(ip):

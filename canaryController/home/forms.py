@@ -13,3 +13,7 @@ class WebHoneyPotForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField()
     potID = forms.IntegerField()
+
+
+class deleteForm(forms.Form):
+    logID = forms.IntegerField()

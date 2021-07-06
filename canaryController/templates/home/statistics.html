@@ -53,7 +53,7 @@
                                         <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
                                             SSH
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">10000</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attackData.1 }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-code fa-2x text-gray-300"></i>
@@ -71,7 +71,7 @@
                                         <div class="text-bg font-weight-bold text-success text-uppercase mb-1">
                                             Mysql
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">2333</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attackData.2 }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-database fa-2x text-gray-300"></i>
@@ -89,7 +89,7 @@
                                         <div class="text-bg font-weight-bold text-success text-uppercase mb-1">
                                             Web
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">2333</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attackData.0 }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-globe fa-2x text-gray-300"></i>
@@ -107,7 +107,7 @@
                                         <div class="text-bg font-weight-bold text-warning text-uppercase mb-1">
                                             RDP
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attackData.3 }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-desktop fa-2x text-gray-300"></i>
@@ -117,8 +117,6 @@
                         </div>
                     </div>
                 </div>
-
-
                 {% include 'home/footer.html' %}
             </div>
         </div>
@@ -132,7 +130,6 @@
     var ctx = document.getElementById('myChart');
     var myChart = new Chart(ctx, {
         type: 'line',
-
         data: {
             labels: [20210301, 20210307, 20210518, 20210611, 20210711],
             datasets: [{
@@ -170,9 +167,9 @@
     var myPie = new Chart(pieCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Web', 'RDP', 'SSH', 'Mysql', 'Scan'],
+            labels: ['Web', 'RDP', 'SSH', 'Mysql'],
             datasets: [{
-                data: [12, 19, 3, 5, 7],
+                data: {{ attackData }},
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
