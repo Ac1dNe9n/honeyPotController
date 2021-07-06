@@ -34,30 +34,35 @@
                             <td>192.168.0.1</td>
                             <td>局域网</td>
                             <td>2018年6月12日14:23</td>
-                            <td><span class="badge bg-success text-white">详细</span></td>
+                            <td data-toggle="modal" data-target="#detail"><span class="badge bg-success text-white">详细</span></td>
                             <td><i class="fas fa-trash text-danger"></i></td>
                         </tr>
-                        <tr>
-                            <td><span class="badge bg-primary text-white">SSH</span>蜜罐2</td>
-                            <td>192.168.0.1</td>
-                            <td>局域网</td>
-                            <td>2018年6月12日14:23</td>
-                            <td><span class="badge bg-success text-white">详细</span></td>
-                            <td><i class="fas fa-trash text-danger"></i></td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-primary text-white">RDP</span>蜜罐5</td>
-                            <td>192.168.0.1</td>
-                            <td>局域网</td>
-                            <td>2018年6月12日14:23</td>
-                            <td><span class="badge bg-success text-white">详细</span></td>
-                            <td><i class="fas fa-trash text-danger"></i></td>
-                        </tr>
+
                         </tbody>
                     </table>
                 </div>
-
                 {% include 'home/footer.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="detail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">日志详细</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>123</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">确定</button>
             </div>
         </div>
     </div>

@@ -24,7 +24,7 @@
                         <div class="card shadow mb-4">
                             <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">攻击时间统计表</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">攻击者来源地</h6>
                             </div>
                             <div class="card-body">
                                 <div class="chart-area">
@@ -38,7 +38,7 @@
                         <div class="card shadow mb-4">
                             <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">攻击者IP TOP10扇形图</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">攻击者IP TOP5扇形图</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="myPieChart"></canvas>
@@ -58,11 +58,11 @@
 <script type="application/javascript">
     var ctx = document.getElementById('myChart');
     var myChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: ['局域网', '北京', '上海', '广东', '陕西', '四川'],
             datasets: [{
-                label: '# of Votes',
+                label: '归属地',
                 data: [12, 19, 3, 5, 2, 3],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -84,6 +84,7 @@
             }]
         },
         options: {
+
             scales: {
                 y: {
                     beginAtZero: true
@@ -94,11 +95,11 @@
 
     var ctx = document.getElementById('myPieChart');
     var myChart = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: ['127.0.0.1', '192.168.0.1', '10.0.3.1','200.200.200.1','20.40.30.10'],
             datasets: [{
-                label: '# of Votes',
+                label: '',
                 data: [12, 19, 3, 5, 2, 3],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
