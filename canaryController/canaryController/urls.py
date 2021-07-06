@@ -21,7 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', v.index),
     path('login/', v.login),
-    path('logout/',v.logout),
+    path('logout/', v.logout),
     path('captcha/', include('captcha.urls')),
-
+    path('Statistics/', v.statistics),
+    path('Source/', v.source),
+    path('log/', v.log),
 ]

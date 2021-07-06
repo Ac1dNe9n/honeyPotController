@@ -2,8 +2,6 @@ from django.shortcuts import render, redirect
 from . import forms
 
 
-
-
 def index(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
@@ -37,3 +35,15 @@ def logout(request):
         return redirect("/login/")
     request.session.flush()
     return redirect("/login/")
+
+
+def statistics(request):
+    return render(request, 'home/statistics.html')
+
+
+def source(request):
+    return render(request, 'home/source.html')
+
+
+def log(request):
+    return render(request, 'home/threatLog.html')
