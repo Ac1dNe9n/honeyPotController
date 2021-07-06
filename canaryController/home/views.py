@@ -1,5 +1,10 @@
+from datetime import datetime
+import requests
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from . import forms
+from django.views.decorators.csrf import csrf_exempt
+
+from . import forms, models
 
 
 def index(request):
@@ -47,3 +52,39 @@ def source(request):
 
 def log(request):
     return render(request, 'home/threatLog.html')
+
+
+def getOrigin(ip):
+    r = requests.get("http://ip.taobao.com//outGetIpInfo?ip=%s" % ip)
+    if r.json()['code'] == 0:
+        i = r.json()['data']
+        if i['city'] == '内网IP':
+            return '局域网'
+        return i['region']
+
+
+@csrf_exempt
+def webHoneyPort(request):
+    if request.method == 'POST':
+        WebHoneyPotForm = forms.WebHoneyPotForm(request.POST)
+        if WebHoneyPotForm.is_valid():
+            ip = WebHoneyPotForm.cleaned_data.get('ip')
+            origin = getOrigin(ip)
+            honeyPotID = WebHoneyPotForm.cleaned_data.get('potID')
+            username = WebHoneyPotForm.cleaned_data.get('username')
+            password = WebHoneyPotForm.cleaned_data.get('password')
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            honeyPotType = 1
+            detail = "非法密码尝试\n用户名：" + username + "\n密码: " + password
+            models.Threat.objects.create(honeyPotID=honeyPotID, honeyPotType=honeyPotType, ip=ip, origin=origin,
+                                         time=now
+                                         , detail=detail)
+            t = models.ThreatType.objects.filter(threatID=1)
+            if t:
+                t.update(num=t[0].num + 1)
+            tip = models.ThreatIP.objects.filter(ip=ip)
+            if tip.exists():
+                tip.update(num=tip[0].num + 1)
+            else:
+                models.ThreatIP.objects.create(ip=ip, origin=origin, num=1)
+    return HttpResponse()
