@@ -26,7 +26,7 @@
                                 <h6 class="m-0 font-weight-bold text-primary">攻击者来源地</h6>
                             </div>
                             <div class="card-body">
-                                    <canvas id="myChart"></canvas>
+                                <canvas id="myChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -56,10 +56,10 @@
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['局域网', '北京', '上海', '广东', '陕西', '四川'],
+            labels: {{ originName|safe }},
             datasets: [{
                 label: '归属地',
-                data: [12, 19, 3, 5, 2, 3],
+                data: {{ originNum|safe }},
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -93,10 +93,10 @@
     var myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['127.0.0.1', '192.168.0.1', '10.0.3.1','200.200.200.1','20.40.30.10'],
+            labels: {{ attackerIP|safe }},
             datasets: [{
                 label: '',
-                data: [12, 19, 3, 5, 2, 3],
+                data: {{ attackerNum|safe }},
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',

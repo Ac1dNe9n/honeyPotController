@@ -50,8 +50,38 @@ def statistics(request):
     return render(request, 'home/statistics.html', {'attackData': temp})
 
 
+def inList(name, l):
+    count = 0
+    for i in l:
+        if name == i:
+            return count
+        count += 1
+    return -1
+
+
 def source(request):
-    return render(request, 'home/source.html')
+    data = models.ThreatIP.objects.all().order_by("-num").values_list('ip', 'origin', 'num')
+    originName = []
+    originNum = []
+    attackerIP = []
+    attackerNum = []
+    count = 0
+    for i in data:
+        if count < 5:
+            attackerIP.append(i[0])
+            attackerNum.append(i[2])
+        count += 1
+        o = i[1]
+        index = inList(o, originName)
+        if index == -1:
+            originName.append(o)
+            originNum.append(i[2])
+        else:
+            originNum[index] += i[2]
+    print("ok")
+    return render(request, 'home/source.html',
+                  {'attackerIP': attackerIP, 'attackerNum': attackerNum, 'originName': originName,
+                   'originNum': originNum})
 
 
 def gethoneyPotType(t):
@@ -71,11 +101,13 @@ def log(request):
         if logForm.is_valid():
             logID = logForm.cleaned_data.get('logID')
             models.Threat.objects.filter(id=logID).delete()
-    data = models.Threat.objects.all().values_list('honeyPotID', 'honeyPotType', 'ip', 'origin', 'time', 'detail', 'id')
+    data = models.Threat.objects.all().values_list('honeyPotID', 'honeyPotType', 'ip', 'origin', 'time', 'detail',
+                                                   'id')
     lg = []
     for i in data:
-        lg.append({'honeyPotID': i[0], 'honeyPotType': gethoneyPotType(i[1]), 'ip': i[2], 'origin': i[3], 'time': i[4],
-                   'detail': i[5], 'id': i[6]})
+        lg.append(
+            {'honeyPotID': i[0], 'honeyPotType': gethoneyPotType(i[1]), 'ip': i[2], 'origin': i[3], 'time': i[4],
+             'detail': i[5], 'id': i[6]})
 
     return render(request, 'home/threatLog.html', {'log': lg})
 
