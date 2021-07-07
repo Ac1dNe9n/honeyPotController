@@ -1,4 +1,6 @@
+import time
 from datetime import datetime
+
 import requests
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -44,10 +46,37 @@ def logout(request):
 
 def statistics(request):
     data = models.ThreatType.objects.all().values_list("num")
+    data1 = models.Threat.objects.all().values_list("time")
+
     temp = []
+    times = []
+    countnum =[0]*6
+    nowtime = datetime.now().strftime("%Y-%m-%d")
+    print(nowtime)
     for i in data:
         temp.append(i[0])
-    return render(request, 'home/statistics.html', {'attackData': temp})
+    for k in data1:
+        datatemp = k[0]
+        if datatemp[:10] == nowtime:
+            if datatemp[11:13] == "0" or datatemp[11:13] == "01" or datatemp[11:13] == "02" or datatemp[11:13] == "03":
+                countnum[0] += 1
+            elif datatemp[11:13] == "04" or datatemp[11:13] == "05" or datatemp[11:13] == "06" or datatemp[11:13] == "07":
+                countnum[1] += 1
+            elif datatemp[11:13] == "08" or datatemp[11:13] == "09" or datatemp[11:13] == "10" or datatemp[11:13] == "11":
+                countnum[2] += 1
+            elif datatemp[11:13] == "12" or datatemp[11:13] == "13" or datatemp[11:13] == "14" or datatemp[11:13] == "15":
+                countnum[3] += 1
+            elif datatemp[11:13] == "16" or datatemp[11:13] == "17" or datatemp[11:13] == "18" or datatemp[11:13] == "19":
+                countnum[4] += 1
+            elif datatemp[11:13] == "20" or datatemp[11:13] == "21" or datatemp[11:13] == "22" or datatemp[11:13] == "23":
+                countnum[5] += 1
+    countnum[1] += countnum[0]
+    countnum[2] += countnum[1]
+    countnum[3] += countnum[2]
+    countnum[4] += countnum[3]
+    countnum[5] += countnum[4]
+    return render(request, 'home/statistics.html', {'attackData': temp,'attacktime' : countnum})
+
 
 
 def inList(name, l):

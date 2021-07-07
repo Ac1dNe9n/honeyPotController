@@ -131,10 +131,10 @@
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [20210301, 20210307, 20210518, 20210611, 20210711],
+            labels: ['0-3', '4-7', '8-11', '12-15', '16-19','20-23'],
             datasets: [{
                 label: 'Threats',
-                data: [1, 3, 4, 7, 20],
+                data: {{ attacktime }},//
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
