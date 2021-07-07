@@ -26,5 +26,6 @@ urlpatterns = [
     path('Statistics/', v.statistics),
     path('Source/', v.source),
     path('log/', v.log),
-    path('webHoneyPort/', v.webHoneyPort),
+    path('webHoneyPot/', v.webHoneyPot),
+    path('mysqlHoneyPot/', v.mysqlHoneyPot),
 ]

@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ThreatType(models.Model):
-    # 1 WEB 2 SSH 3 DRP 4 Mysql
+    # 1 WEB 2 Mysql 3 DRP 4 SSH
     threatID = models.IntegerField(primary_key=True)
     num = models.IntegerField()
 

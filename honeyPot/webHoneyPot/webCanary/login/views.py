@@ -20,7 +20,7 @@ def login(request):
             password = UserLoginForm.cleaned_data.get('password')
             ip = get_ip(request)
             print(ip)
-            url = 'http://10.122.196.144/webHoneyPort/'
+            url = 'http://10.22.145.106/webHoneyPot/'
             data = {'ip': ip, 'username': username, 'password': password, 'potID': 1}
             r = requests.post(url, data)
             print(r.status_code)

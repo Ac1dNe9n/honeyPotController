@@ -8,6 +8,12 @@ class UserLoginForm(forms.Form):
     captcha = CaptchaField()
 
 
+class MysqlHoneyPot(forms.Form):
+    ip = forms.CharField()
+    file = forms.CharField()
+    potID = forms.IntegerField()
+
+
 class WebHoneyPotForm(forms.Form):
     ip = forms.CharField()
     username = forms.CharField()
