@@ -26,6 +26,10 @@ urlpatterns = [
     path('Statistics/', v.statistics),
     path('Source/', v.source),
     path('log/', v.log),
+    path('about/', v.about),
     path('webHoneyPot/', v.webHoneyPot),
     path('mysqlHoneyPot/', v.mysqlHoneyPot),
+    path('reset/', v.resetPot),
+    path('del/', v.delPot),
+    path('add/', v.addPot),
 ]

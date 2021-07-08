@@ -18,27 +18,42 @@
             <div class="container-fluid">
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">蜜罐状态管理</h1>
+                    <i id="addPot" class="fas fa-plus-circle fa-2x" data-toggle="modal"
+                       data-target="#add"></i>
                 </div>
                 <div class="row">
-                    <div class="col-xl-3 col-md-6 mb-4" data-toggle="modal"
-                         data-target="#reset">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
-                                            蜜罐1
+                    {% for p in pots %}
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center" id="{{ p.honeyPotID }}">
+                                        <div class="col">
+                                            <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
+                                                <span
+                                                        class="badge bg-primary text-white mr-1">{{ p.honeyPotType }}</span>蜜罐{{ p.honeyPotID }}
+                                                <i
+                                                        data-toggle="modal"
+                                                        data-target="#del"
+                                                        class="fas fa-trash text-dark ml-3 delPot"></i>
+                                            </div>
+                                            <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>
+                                            {% if p.status == 1 %}
+                                                <div>状态：<i class="fas fa-circle text-success"></i> 正常</div>
+                                            {% else %}
+                                                <div>状态：<i class="fas fa-circle text-danger"></i> 遭受攻击</div>
+                                            {% endif %}
                                         </div>
-                                        <div><i class="fas fa-circle text-success"></i> 正常</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-undo-alt fa-2x text-dark"></i>
+                                        <div class="col-auto">
+                                            <div data-toggle="modal"
+                                                 data-target="#reset">
+                                                <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    {% endfor %}
                 </div>
                 {% include 'home/footer.html' %}
             </div>
@@ -55,14 +70,74 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="/reset">
+            <form method="post" action="/reset/">
                 <div class="modal-body">
-                    <p class="text-danger">确定重置蜜罐?</p>
-                    <input type="hidden" id="honeyPotID">
+                    <p class="text-danger" id="resetInfo"></p>
+                    {% csrf_token %}
+                    <input type="hidden" id="resetPotID" name="potID">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary">确定</button>
+                    <button type="submit" class="btn btn-primary">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="del" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">删除蜜罐</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/del/">
+                <div class="modal-body">
+                    <p class="text-danger" id="delInfo">确定删除蜜罐?</p>
+                    {% csrf_token %}
+                    <input type="hidden" id="delPotID" name="potID">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加蜜罐</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/add/" method="post">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="dep">蜜罐选择</label>
+                        <select id="dep" class="form-control" name='potType'>
+                            <option value=1>web</option>
+                            <option value=2>mysql1</option>
+                            <option value=3>mysql2</option>
+                            <option value=4>ssh1</option>
+                            <option value=5>ssh2</option>
+                            <option value=6>rdp</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">新建</button>
                 </div>
             </form>
         </div>
@@ -73,6 +148,21 @@
 <script src="{% static 'thirdpart/jquery/jquery.js' %}"></script>
 <script src="{% static 'thirdpart/popper/popper.js' %}"></script>
 <script src="{% static 'thirdpart/bootstrap/bootstrap.min.js' %}"></script>
+<script type="application/javascript">
+    $(".delPot").click(function () {
+        var PotID = $(this).parent().parent().parent().attr("id");
+        $("#delInfo").html("确定删除蜜罐" + PotID + "?");
+        $("#delPotID").val(PotID);
+    })
 
+
+    $(".reset").click(function () {
+        var PotID = $(this).parent().parent().parent().attr("id");
+        $("#resetInfo").html("确定重置蜜罐" + PotID + "?");
+        $("#resetPotID").val(PotID);
+    })
+
+
+</script>
 </body>
 </html>

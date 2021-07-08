@@ -1,8 +1,8 @@
 from django.db import models
 
 
+# 1 WEB 2 Mysql 3 DRP 4 SSH
 class ThreatType(models.Model):
-    # 1 WEB 2 Mysql 3 DRP 4 SSH
     threatID = models.IntegerField(primary_key=True)
     num = models.IntegerField()
 
@@ -21,3 +21,10 @@ class Threat(models.Model):
     origin = models.CharField(max_length=100)
     time = models.CharField(max_length=30)
     detail = models.TextField()
+
+
+class HoneyPots(models.Model):
+    honeyPotID = models.AutoField(primary_key=True)
+    honeyPotType = models.IntegerField()  # 1 WEB 2 Mysql 3 DRP 4 SSH
+    ThreatNum = models.IntegerField()
+    status = models.IntegerField()  # 1 正常  2 遭受攻击

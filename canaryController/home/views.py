@@ -1,17 +1,20 @@
 from datetime import datetime
-
 import requests
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-
 from . import forms, models
 
 
 def index(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
-    return render(request, "home/index.html")
+    honeyPots = models.HoneyPots.objects.all().values_list("honeyPotID", "honeyPotType", "ThreatNum", "status")
+    pots = []
+    for p in honeyPots:
+        pots.append(
+            {'honeyPotID': p[0], 'honeyPotType': gethoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3]})
+    return render(request, "home/index.html", {"pots": pots})
 
 
 def login(request):
@@ -44,6 +47,8 @@ def logout(request):
 
 
 def statistics(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
     data = models.ThreatType.objects.all().values_list("num")
     data1 = models.Threat.objects.all().values_list("time")
     temp = []
@@ -55,7 +60,8 @@ def statistics(request):
     for k in data1:
         datatemp = k[0]
         if datatemp[:10] == nowtime:
-            if datatemp[11:13] == "0" or datatemp[11:13] == "01" or datatemp[11:13] == "02" or datatemp[11:13] == "03":
+            if datatemp[11:13] == "0" or datatemp[11:13] == "01" or datatemp[11:13] == "02" or datatemp[
+                                                                                               11:13] == "03":
                 countnum[0] += 1
             elif datatemp[11:13] == "04" or datatemp[11:13] == "05" or datatemp[11:13] == "06" or datatemp[
                                                                                                   11:13] == "07":
@@ -90,6 +96,8 @@ def inList(name, l):
 
 
 def source(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
     data = models.ThreatIP.objects.all().order_by("-num").values_list('ip', 'origin', 'num')
     originName = []
     originNum = []
@@ -126,6 +134,8 @@ def gethoneyPotType(t):
 
 
 def log(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
     if request.method == "POST":
         logForm = forms.deleteForm(request.POST)
         if logForm.is_valid():
@@ -142,6 +152,12 @@ def log(request):
     return render(request, 'home/threatLog.html', {'log': lg})
 
 
+def about(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
+    return render(request, 'home/about.html')
+
+
 def getOrigin(ip):
     r = requests.get("http://ip.taobao.com//outGetIpInfo?ip=%s" % ip)
     if r.json()['code'] == 0:
@@ -149,6 +165,38 @@ def getOrigin(ip):
         if i['city'] == '内网IP':
             return '局域网'
         return i['region']
+
+
+def resetPot(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
+    if request.method == 'POST':
+        manageForm = forms.managePotForm(request.POST)
+        if manageForm.is_valid():
+            potID = manageForm.cleaned_data.get('potID')
+    return redirect("/")
+
+
+def delPot(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
+    if request.method == 'POST':
+        manageForm = forms.managePotForm(request.POST)
+        if manageForm.is_valid():
+            potID = manageForm.cleaned_data.get('potID')
+            models.HoneyPots.objects.filter(honeyPotID=potID).delete()
+    return redirect("/")
+
+
+def addPot(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
+    if request.method == 'POST':
+        manageForm = forms.addPotForm(request.POST)
+        if manageForm.is_valid():
+            potType = manageForm.cleaned_data.get('potType')
+            models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1)
+    return redirect("/")
 
 
 @csrf_exempt

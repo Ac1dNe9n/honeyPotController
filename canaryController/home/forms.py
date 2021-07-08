@@ -23,3 +23,11 @@ class WebHoneyPotForm(forms.Form):
 
 class deleteForm(forms.Form):
     logID = forms.IntegerField()
+
+
+class managePotForm(forms.Form):
+    potID = forms.IntegerField()
+
+
+class addPotForm(forms.Form):
+    potType = forms.IntegerField()
