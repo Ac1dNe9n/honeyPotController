@@ -29,5 +29,13 @@ class managePotForm(forms.Form):
     potID = forms.IntegerField()
 
 
-class addPotForm(forms.Form):
+class addForm(forms.Form):
     potType = forms.IntegerField()
+
+
+class addSSHFrom(forms.Form):
+    potType = forms.IntegerField()
+    port = forms.CharField()
+    ip = forms.CharField()
+    username = forms.CharField()
+    passwd = forms.CharField()

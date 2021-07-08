@@ -22,36 +22,8 @@
                        data-target="#addOut"></i>
                 </div>
                 <div class="row mb-3">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center"
-                                     id="2">
-                                    <div class="col">
-                                        <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
-                                            <span class="badge bg-primary text-white mr-1">RDP</span>蜜罐1
-                                        </div>
-                                        <p class="text-primary">威胁数量：{{ rdpThreatNum }}</p>
-                                        {% if rdpStatus == 1 %}
-                                            <div>状态：<i class="fas fa-circle text-success"></i> 正常
-                                            </div>
-                                        {% else %}
-                                            <div>状态：<i class="fas fa-circle text-danger"></i> 遭受攻击
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-auto">
-                                        <div data-toggle="modal"
-                                             data-target="#reset">
-                                            <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     {% for p in pots %}
-                        {% if p.IsIntranet %}
+                        {% if not p.IsIntranet %}
                             <div class="col-xl-3 col-md-6 mb-4">
                                 <div class="card border-left-primary shadow h-100 py-2">
                                     <div class="card-body">
@@ -61,10 +33,12 @@
                                                 <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
                                                                                 <span
                                                                                         class="badge bg-primary text-white mr-1">{{ p.honeyPotType }}</span>蜜罐{{ p.honeyPotID }}
-                                                    <i
-                                                            data-toggle="modal"
-                                                            data-target="#del"
-                                                            class="fas fa-trash text-danger ml-1 delPot"></i>
+                                                    {% if not p.honeyPotID == 1 %}
+                                                        <i
+                                                                data-toggle="modal"
+                                                                data-target="#del"
+                                                                class="fas fa-trash text-danger ml-1 delPot"></i>
+                                                    {% endif %}
                                                 </div>
                                                 <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>
                                                 {% if p.status == 1 %}
@@ -95,7 +69,7 @@
                                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-primary">SSH蜜罐环境</h6>
                             <i id="addPot" class="fas fa-plus-circle fa-2x" data-toggle="modal"
-                               data-target="#add"></i>
+                               data-target="#addOut"></i>
 
                         </div>
                         <div class="card-body">

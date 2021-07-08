@@ -31,5 +31,5 @@ urlpatterns = [
     path('mysqlHoneyPot/', v.mysqlHoneyPot),
     path('reset/', v.resetPot),
     path('del/', v.delPot),
-    path('add/', v.addPot),
+    path('addOut/', v.addOutPot),
 ]

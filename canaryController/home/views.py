@@ -14,26 +14,13 @@ import hashlib
 def index(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
-    honeyPots = models.HoneyPots.objects.all().values_list("honeyPotID", "honeyPotType", "ThreatNum", "status")
+    honeyPots = models.HoneyPots.objects.all().values_list("honeyPotID", "honeyPotType", "ThreatNum", "status",
+                                                           "IsIntranet")
     pots = []
-    count = 0
-    sshThreatNum = 0
-    rdpThreatNum = 0
-    sshStatus = 1
-    rdpStatus = 1
     for p in honeyPots:
-        if count == 0:
-            sshThreatNum = p[2]
-            sshStatus = p[3]
-        elif count == 1:
-            rdpThreatNum = p[2]
-            rdpStatus = p[3]
-        else:
-            pots.append({'honeyPotID': p[0], 'honeyPotType': gethoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3]})
-        count += 1
-    return render(request, "home/index.html",
-                  {"pots": pots, "sshThreatNum": sshThreatNum, "sshStatus": sshStatus, "rdpThreatNum": rdpThreatNum,
-                   "rdpStatus": rdpStatus})
+        pots.append({'honeyPotID': p[0], 'honeyPotType': getHoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3],
+                     "IsIntranet": p[4]})
+    return render(request, "home/index.html", {"pots": pots})
 
 
 def login(request):
@@ -141,7 +128,7 @@ def source(request):
                    'originNum': originNum})
 
 
-def gethoneyPotType(t):
+def getHoneyPotType(t):
     if t == 1:
         return "Web"
     elif t == 2:
@@ -175,7 +162,7 @@ def log(request):
     lg = []
     for i in data:
         lg.append(
-            {'honeyPotID': i[0], 'honeyPotType': gethoneyPotType(i[1]), 'ip': i[2], 'origin': i[3], 'time': i[4],
+            {'honeyPotID': i[0], 'honeyPotType': getHoneyPotType(i[1]), 'ip': i[2], 'origin': i[3], 'time': i[4],
              'detail': i[5], 'id': i[6]})
     return render(request, 'home/threatLog.html', {'log': lg})
 
@@ -195,15 +182,25 @@ def getOrigin(ip):
         return i['region']
 
 
-def addPot(request):
+def addOutPot(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
     if request.method == 'POST':
-        manageForm = forms.addPotForm(request.POST)
-        if manageForm.is_valid():
-            potType = manageForm.cleaned_data.get('potType')
-            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1)
-            temp.honeyPotID
+        addSSHForm = forms.addSSHFrom(request.POST)
+        if addSSHForm.is_valid():
+            potType = addSSHForm.cleaned_data.get('potType')
+            username = addSSHForm.cleaned_data.get('username')
+            passwd = addSSHForm.cleaned_data.get('passwd')
+            port = addSSHForm.cleaned_data.get('port')
+            ip = addSSHForm.cleaned_data.get('ip')
+            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, IsIntranet=False)
+            id = temp.honeyPotID
+        else:
+            manageForm = forms.addForm(request.POST)
+            if manageForm.is_valid():
+                potType = manageForm.cleaned_data.get('potType')
+                temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, IsIntranet=False)
+                id = temp.honeyPotID
     return redirect("/")
 
 
