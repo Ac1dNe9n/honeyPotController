@@ -19,46 +19,133 @@
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-0 text-gray-800">蜜罐状态管理</h1>
                     <i id="addPot" class="fas fa-plus-circle fa-2x" data-toggle="modal"
-                       data-target="#add"></i>
+                       data-target="#addOut"></i>
                 </div>
-                <div class="row">
-                    {% for p in pots %}
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center" id="{{ p.honeyPotID }}">
-                                        <div class="col">
-                                            <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
-                                                <span
-                                                        class="badge bg-primary text-white mr-1">{{ p.honeyPotType }}</span>蜜罐{{ p.honeyPotID }}
-                                                <i
-                                                        data-toggle="modal"
-                                                        data-target="#del"
-                                                        class="fas fa-trash text-danger ml-1 delPot"></i>
-                                            </div>
-                                            <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>
-                                            {% if p.status == 1 %}
-                                                <div>状态：<i class="fas fa-circle text-success"></i> 正常</div>
-                                            {% else %}
-                                                <div>状态：<i class="fas fa-circle text-danger"></i> 遭受攻击</div>
-                                            {% endif %}
+                <div class="row mb-3">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center"
+                                     id="2">
+                                    <div class="col">
+                                        <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
+                                            <span class="badge bg-primary text-white mr-1">RDP</span>蜜罐1
                                         </div>
-                                        <div class="col-auto">
-                                            <div data-toggle="modal"
-                                                 data-target="#reset">
-                                                <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
+                                        <p class="text-primary">威胁数量：{{ rdpThreatNum }}</p>
+                                        {% if rdpStatus == 1 %}
+                                            <div>状态：<i class="fas fa-circle text-success"></i> 正常
                                             </div>
+                                        {% else %}
+                                            <div>状态：<i class="fas fa-circle text-danger"></i> 遭受攻击
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-auto">
+                                        <div data-toggle="modal"
+                                             data-target="#reset">
+                                            <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    {% for p in pots %}
+                        {% if p.IsIntranet %}
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center"
+                                             id="{{ p.honeyPotID }}">
+                                            <div class="col">
+                                                <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
+                                                                                <span
+                                                                                        class="badge bg-primary text-white mr-1">{{ p.honeyPotType }}</span>蜜罐{{ p.honeyPotID }}
+                                                    <i
+                                                            data-toggle="modal"
+                                                            data-target="#del"
+                                                            class="fas fa-trash text-danger ml-1 delPot"></i>
+                                                </div>
+                                                <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>
+                                                {% if p.status == 1 %}
+                                                    <div>状态：<i class="fas fa-circle text-success"></i> 正常
+                                                    </div>
+                                                {% else %}
+                                                    <div>状态：<i class="fas fa-circle text-danger"></i> 遭受攻击
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-auto">
+                                                <div data-toggle="modal"
+                                                     data-target="#reset">
+                                                    <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endfor %}
+
                 </div>
-                {% include 'home/footer.html' %}
+                <div class="row">
+                    <div class="card shadow mb-4" style="width: 100%">
+                        <div
+                                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">SSH蜜罐环境</h6>
+                            <i id="addPot" class="fas fa-plus-circle fa-2x" data-toggle="modal"
+                               data-target="#add"></i>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for p in pots %}
+                                    {% if p.IsIntranet %}
+                                        <div class="col-xl-3 col-md-6 mb-4">
+                                            <div class="card border-left-primary shadow h-100 py-2">
+                                                <div class="card-body">
+                                                    <div class="row no-gutters align-items-center"
+                                                         id="{{ p.honeyPotID }}">
+                                                        <div class="col">
+                                                            <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
+                                                                                <span
+                                                                                        class="badge bg-primary text-white mr-1">{{ p.honeyPotType }}</span>蜜罐{{ p.honeyPotID }}
+                                                                <i
+                                                                        data-toggle="modal"
+                                                                        data-target="#del"
+                                                                        class="fas fa-trash text-danger ml-1 delPot"></i>
+                                                            </div>
+                                                            <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>
+                                                            {% if p.status == 1 %}
+                                                                <div>状态：<i class="fas fa-circle text-success"></i> 正常
+                                                                </div>
+                                                            {% else %}
+                                                                <div>状态：<i class="fas fa-circle text-danger"></i> 遭受攻击
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div data-toggle="modal"
+                                                                 data-target="#reset">
+                                                                <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            {% include 'home/footer.html' %}
         </div>
     </div>
+</div>
 </div>
 
 <div class="modal fade" id="reset" tabindex="-1" aria-hidden="true">
@@ -111,7 +198,7 @@
 </div>
 
 
-<div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="addOut" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -120,7 +207,39 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="/add/" method="post">
+            <form action="/addOut/" method="post">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>蜜罐选择</label>
+                        <select id="addSelect" class="form-control" name='potType'>
+                            <option value=1>web</option>
+                            <option value=2>mysql</option>
+                            <option value=4>高仿真SSH</option>
+                        </select>
+                    </div>
+                    <input class="form-control mb-2" name="port" placeholder="指定端口">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">新建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addIn" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加蜜罐</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/addIn/" method="post">
                 <div class="modal-body">
                     {% csrf_token %}
                     <div class="form-group">
@@ -129,9 +248,6 @@
                             <option value=1>web</option>
                             <option value=2>mysql1</option>
                             <option value=3>mysql2</option>
-                            <option value=4>ssh1</option>
-                            <option value=5>ssh2</option>
-                            <option value=6>rdp</option>
                         </select>
                     </div>
                 </div>
@@ -149,12 +265,12 @@
 <script src="{% static 'thirdpart/popper/popper.js' %}"></script>
 <script src="{% static 'thirdpart/bootstrap/bootstrap.min.js' %}"></script>
 <script type="application/javascript">
+
     $(".delPot").click(function () {
         var PotID = $(this).parent().parent().parent().attr("id");
         $("#delInfo").html("确定删除蜜罐" + PotID + "?");
         $("#delPotID").val(PotID);
     })
-
 
     $(".reset").click(function () {
         var PotID = $(this).parent().parent().parent().attr("id");
@@ -162,7 +278,14 @@
         $("#resetPotID").val(PotID);
     })
 
-
+    $("#addSelect").change(function () {
+        let temp = $("#addSelect").val();
+        if (temp == 4) {
+            $(this).parent().parent().append("<input class=\"form-control mb-2\" name=\"ip\" placeholder=\"指定IP\">\n" +
+                "                    <input class=\"form-control mb-2\" name=\"username\" placeholder=\"用户名\">\n" +
+                "                    <input class=\"form-control mb-2\" name=\"passwd\" placeholder=\"密码\">")
+        }
+    })
 </script>
 </body>
 </html>

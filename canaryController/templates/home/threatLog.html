@@ -21,6 +21,7 @@
                         <thead>
                         <tr>
                             <th>蜜罐编号</th>
+                            <th>蜜罐归属</th>
                             <th>来源IP</th>
                             <th>地理位置</th>
                             <th>时间</th>
@@ -34,21 +35,16 @@
                                 <td><span
                                         class="badge bg-primary text-white">{{ l.honeyPotType }}</span>蜜罐{{ l.honeyPotID }}
                                 </td>
+                                <td>{{ l.loc }}</td>
                                 <td>{{ l.ip }}</td>
                                 <td>{{ l.origin }}</td>
                                 <td>{{ l.time }}</td>
                                 <td data-toggle="modal" data-target="#id{{ l.id }}"><span
                                         class="badge bg-success text-white">查看详细</span>
                                 </td>
-                                <td>
-                                    <form method="post" action="/log/">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="logID" value={{ l.id }}>
-                                        <button type="submit" class="btn-info">删除</button>
-                                        {#                                        <div type="submit">#}
-                                        {#                                            <i class="fas fa-trash text-danger"></i>#}
-                                        {#                                        </div>#}
-                                    </form>
+                                <td id="{{ l.id }}">
+                                    <i data-toggle="modal"
+                               data-target="#del" class="fas fa-trash text-danger delLog"></i>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -86,12 +82,41 @@
 </div>
 
 
+<div class="modal fade" id="del" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">删除日志</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/log/">
+                <div class="modal-body">
+                    <p class="text-danger" id="delLog">确定删除日志?</p>
+                    {% csrf_token %}
+                    <input type="hidden" id="delLogID" name="logID">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script src="{% static 'thirdpart/jquery/jquery.js' %}"></script>
 <script src="{% static 'thirdpart/popper/popper.js' %}"></script>
 <script src="{% static 'thirdpart/bootstrap/bootstrap.min.js' %}"></script>
 <script src="{% static 'thirdpart/dataTable/datatables.min.js' %}"></script>
 <script src="{% static 'thirdpart/dataTable/setting.js' %}"></script>
-
-
+<script type="application/javascript">
+    $(".delLog").click(function () {
+        let id = $(this).parent().attr("id");
+        $("#delLogID").val(id);
+    })
+</script>
 </body>
 </html>

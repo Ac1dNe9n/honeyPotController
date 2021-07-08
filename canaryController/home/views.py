@@ -4,6 +4,11 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from . import forms, models
+import socket
+import rsa
+import pickle
+from cryptography.fernet import Fernet
+import hashlib
 
 
 def index(request):
@@ -11,10 +16,24 @@ def index(request):
         return redirect("/login/")
     honeyPots = models.HoneyPots.objects.all().values_list("honeyPotID", "honeyPotType", "ThreatNum", "status")
     pots = []
+    count = 0
+    sshThreatNum = 0
+    rdpThreatNum = 0
+    sshStatus = 1
+    rdpStatus = 1
     for p in honeyPots:
-        pots.append(
-            {'honeyPotID': p[0], 'honeyPotType': gethoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3]})
-    return render(request, "home/index.html", {"pots": pots})
+        if count == 0:
+            sshThreatNum = p[2]
+            sshStatus = p[3]
+        elif count == 1:
+            rdpThreatNum = p[2]
+            rdpStatus = p[3]
+        else:
+            pots.append({'honeyPotID': p[0], 'honeyPotType': gethoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3]})
+        count += 1
+    return render(request, "home/index.html",
+                  {"pots": pots, "sshThreatNum": sshThreatNum, "sshStatus": sshStatus, "rdpThreatNum": rdpThreatNum,
+                   "rdpStatus": rdpStatus})
 
 
 def login(request):
@@ -126,11 +145,21 @@ def gethoneyPotType(t):
     if t == 1:
         return "Web"
     elif t == 2:
-        return "Mysql"
+        return "Mysql1"
     elif t == 3:
+        return "Mysql2"
+    elif t == 4:
+        return "SSH高仿真"
+    elif t == 5:
         return "RDP"
+    elif t == 6:
+        return "SSH环境"
+    elif t == 7:
+        return "内网WEB"
+    elif t == 8:
+        return "内网数据库"
     else:
-        return "SSH"
+        return "其他"
 
 
 def log(request):
@@ -148,7 +177,6 @@ def log(request):
         lg.append(
             {'honeyPotID': i[0], 'honeyPotType': gethoneyPotType(i[1]), 'ip': i[2], 'origin': i[3], 'time': i[4],
              'detail': i[5], 'id': i[6]})
-
     return render(request, 'home/threatLog.html', {'log': lg})
 
 
@@ -167,13 +195,15 @@ def getOrigin(ip):
         return i['region']
 
 
-def resetPot(request):
+def addPot(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
     if request.method == 'POST':
-        manageForm = forms.managePotForm(request.POST)
+        manageForm = forms.addPotForm(request.POST)
         if manageForm.is_valid():
-            potID = manageForm.cleaned_data.get('potID')
+            potType = manageForm.cleaned_data.get('potType')
+            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1)
+            temp.honeyPotID
     return redirect("/")
 
 
@@ -188,14 +218,13 @@ def delPot(request):
     return redirect("/")
 
 
-def addPot(request):
+def resetPot(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
     if request.method == 'POST':
-        manageForm = forms.addPotForm(request.POST)
+        manageForm = forms.managePotForm(request.POST)
         if manageForm.is_valid():
-            potType = manageForm.cleaned_data.get('potType')
-            models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1)
+            potID = manageForm.cleaned_data.get('potID')
     return redirect("/")
 
 
@@ -250,3 +279,37 @@ def webHoneyPot(request):
             else:
                 models.ThreatIP.objects.create(ip=ip, origin=origin, num=1)
     return HttpResponse()
+
+
+# mode: 1 添加 2 删除 3 重置
+def sendSSH1Data(addr, data):
+    asyKey = rsa.newkeys(2048)
+    # 公钥和私钥
+    publicKey = asyKey[0]
+    privateKey = asyKey[1]
+    # 创建socket通信对象
+    # 默认使用AF_INET协议族，即ipv4地址和端口号的组合以及tcp协议
+    clientSocket = socket.socket()
+    # 默认连接服务器地址为本机ip和8080端口
+    clientSocket.connect(addr)
+
+    # 向服务器传递公钥，和该公钥字符串化后的sha256值
+    print("正在向服务器传送公钥")
+    sendKey = pickle.dumps(publicKey)
+    sendKeySha256 = hashlib.sha256(sendKey).hexdigest()
+    clientSocket.send(pickle.dumps((sendKey, sendKeySha256)))
+
+    # 接受服务器传递的密钥并进行解密
+    symKey, symKeySha256 = pickle.loads(clientSocket.recv(1024))
+    if hashlib.sha256(symKey).hexdigest() != symKeySha256:
+        print("error")
+    else:
+        print("密钥交换完成")
+        symKey = pickle.loads(rsa.decrypt(symKey, privateKey))
+    # 初始化加密对象
+    f = Fernet(symKey)
+    en_sendData = f.encrypt(data.encode())
+    clientSocket.send(en_sendData)
+    en_recvData = clientSocket.recv(1024)
+    recvData = f.decrypt(en_recvData).decode()
+    print("接受到服务器传来的消息：{0}".format(recvData))
