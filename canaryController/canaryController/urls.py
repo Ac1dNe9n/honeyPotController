@@ -32,4 +32,5 @@ urlpatterns = [
     path('reset/', v.resetPot),
     path('del/', v.delPot),
     path('addOut/', v.addOutPot),
+    path('addIn/',v.addInPot),
 ]

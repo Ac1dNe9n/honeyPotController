@@ -15,11 +15,11 @@ def index(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
     honeyPots = models.HoneyPots.objects.all().values_list("honeyPotID", "honeyPotType", "ThreatNum", "status",
-                                                           "IsIntranet")
+                                                           "IsIntranet", 'port')
     pots = []
     for p in honeyPots:
         pots.append({'honeyPotID': p[0], 'honeyPotType': getHoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3],
-                     "IsIntranet": p[4]})
+                     "IsIntranet": p[4], 'addr': p[5]})
     return render(request, "home/index.html", {"pots": pots})
 
 
@@ -180,6 +180,19 @@ def getOrigin(ip):
         if i['city'] == '内网IP':
             return '局域网'
         return i['region']
+
+
+def addInPot(request):
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
+    if request.method == 'POST':
+        manageForm = forms.addForm(request.POST)
+        if manageForm.is_valid():
+            potType = manageForm.cleaned_data.get('potType')
+            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, IsIntranet=True)
+            id = temp.honeyPotID
+            print(id)
+    return redirect("/")
 
 
 def addOutPot(request):
