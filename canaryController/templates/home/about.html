@@ -1,10 +1,34 @@
-<!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>关于</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>管理端</title>
+    <link rel="stylesheet" href="{% static 'thirdpart/fontawesome/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'home/admin.min.css' %}">
 </head>
-<body>
-    <p>这是个about page  但是我懒得写</p>
+
+<body id="page-top">
+<div id="wrapper">
+    {% include 'home/sidebar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            {% include 'home/head.html' %}
+            <div class="container-fluid">
+                <p>这是about Page 但是我懒得写了</p>
+                {% include 'home/footer.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="{% static 'thirdpart/jquery/jquery.js' %}"></script>
+<script src="{% static 'thirdpart/popper/popper.js' %}"></script>
+<script src="{% static 'thirdpart/bootstrap/bootstrap.min.js' %}"></script>
+
 </body>
 </html>
