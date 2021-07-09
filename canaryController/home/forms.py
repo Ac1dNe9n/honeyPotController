@@ -21,6 +21,21 @@ class WebHoneyPotForm(forms.Form):
     potID = forms.IntegerField()
 
 
+class RDPHoneyPotForm(forms.Form):
+    ip = forms.CharField()
+    port = forms.CharField()
+    ConnectTime = forms.CharField()
+    DisconnectTime = forms.CharField()
+    fileName = forms.CharField()
+
+
+class RDPHoneyPotConnectForm(forms.Form):
+    ip = forms.CharField()
+    port = forms.CharField()
+    ConnectTime = forms.CharField()
+    DisconnectTime = forms.CharField()
+
+
 class deleteForm(forms.Form):
     logID = forms.IntegerField()
 
@@ -30,6 +45,11 @@ class managePotForm(forms.Form):
 
 
 class addForm(forms.Form):
+    potType = forms.IntegerField()
+    port = forms.CharField()
+
+
+class addInForm(forms.Form):
     potType = forms.IntegerField()
 
 

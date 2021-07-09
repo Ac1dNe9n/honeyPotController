@@ -33,16 +33,20 @@
                                                 <div class="text-bg font-weight-bold text-primary text-uppercase mb-1">
                                                                                 <span
                                                                                         class="badge bg-primary text-white mr-1">{{ p.honeyPotType }}</span>蜜罐{{ p.honeyPotID }}
-                                                    {% if not p.honeyPotID == 1 %}
+
+                                                    {% if not p.honeyPotID == 2 %}
                                                         <i
                                                                 data-toggle="modal"
                                                                 data-target="#del"
                                                                 class="fas fa-trash text-danger ml-1 delPot"></i>
                                                     {% endif %}
+
+                                                    {% if p.honeyPotType == 'SSH高仿真' %}
+                                                        <button class="btn-light"><a
+                                                                href="http://192.168.46.136:8081">日志</a>
+                                                        </button>
+                                                    {% endif %}
                                                 </div>
-                                                {#                                                {% if not p.honeyPotID == 1 %}#}
-                                                {#                                                    <p class="text-dark">蜜罐地址：{{ p.addr }}</p>#}
-                                                {#                                                {% endif %}#}
                                                 <p class="text-dark">威胁数量：{{ p.ThreatNum }}</p>
                                                 {% if p.status == 1 %}
                                                     <div>状态：<i class="fas fa-circle text-success"></i> 正常
@@ -71,8 +75,14 @@
                         <div
                                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-primary">SSH蜜罐环境</h6>
+
                             <i id="addPot" class="fas fa-plus-circle fa-2x" data-toggle="modal"
                                data-target="#addIn"></i>
+                            <div data-toggle="modal"
+                                 data-target="#resetSSH">
+                                <i class="fas fa-undo-alt fa-2x text-dark reset"></i>
+                            </div>
+                            <button id="getLog" class="btn-light"><a href="http://192.168.46.8:8081">日志</a></button>
 
                         </div>
                         <div class="card-body">
@@ -93,7 +103,7 @@
                                                                         data-target="#del"
                                                                         class="fas fa-trash text-danger ml-1 delPot"></i>
                                                             </div>
-                                                            <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>
+{#                                                            <p class="text-primary">威胁数量：{{ p.ThreatNum }}</p>#}
                                                             {% if p.status == 1 %}
                                                                 <div>状态：<i class="fas fa-circle text-success"></i> 正常
                                                                 </div>
@@ -139,6 +149,31 @@
                     <p class="text-danger" id="resetInfo"></p>
                     {% csrf_token %}
                     <input type="hidden" id="resetPotID" name="potID">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="resetSSH" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">重置蜜罐</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/resetSSH/">
+                <div class="modal-body">
+                    <p class="text-danger" id="resetInfo">确定要重置SSH环境？</p>
+                    {% csrf_token %}
+                    <input type="hidden" value=1 name="potID">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
@@ -265,6 +300,7 @@
             $("#in3").remove();
         }
     })
+
 </script>
 </body>
 </html>

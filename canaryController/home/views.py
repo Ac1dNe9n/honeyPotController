@@ -4,11 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from . import forms, models
-import socket
-import rsa
-import pickle
-from cryptography.fernet import Fernet
-import hashlib
+from .sock import sendSSHData, sendRealSSHData, sendMessage
 
 
 def index(request):
@@ -18,6 +14,8 @@ def index(request):
                                                            "IsIntranet", 'port')
     pots = []
     for p in honeyPots:
+        if p[1] == 6:
+            continue
         pots.append({'honeyPotID': p[0], 'honeyPotType': getHoneyPotType(p[1]), 'ThreatNum': p[2], "status": p[3],
                      "IsIntranet": p[4], 'addr': p[5]})
     return render(request, "home/index.html", {"pots": pots})
@@ -143,8 +141,6 @@ def getHoneyPotType(t):
         return "SSH环境"
     elif t == 7:
         return "内网WEB"
-    elif t == 8:
-        return "内网数据库"
     else:
         return "其他"
 
@@ -186,12 +182,14 @@ def addInPot(request):
     if not request.session.get('is_login', None):
         return redirect("/login/")
     if request.method == 'POST':
-        manageForm = forms.addForm(request.POST)
+        manageForm = forms.addInForm(request.POST)
         if manageForm.is_valid():
             potType = manageForm.cleaned_data.get('potType')
-            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, IsIntranet=True)
+            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, port="",
+                                                   IsIntranet=True)
             id = temp.honeyPotID
-            print(id)
+            addr = sendRealSSHData(('192.168.46.8', 20003), "2", str(id))
+            print(addr)
     return redirect("/")
 
 
@@ -206,14 +204,27 @@ def addOutPot(request):
             passwd = addSSHForm.cleaned_data.get('passwd')
             port = addSSHForm.cleaned_data.get('port')
             ip = addSSHForm.cleaned_data.get('ip')
-            temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, IsIntranet=False)
+            temp = models.HoneyPots.objects.create(honeyPotType=potType, port=port, ThreatNum=0, status=1,
+                                                   IsIntranet=False)
             id = temp.honeyPotID
+            sendSSHData(('192.168.46.136', 20002), '1', ip, port, id, username, passwd)
         else:
             manageForm = forms.addForm(request.POST)
             if manageForm.is_valid():
                 potType = manageForm.cleaned_data.get('potType')
-                temp = models.HoneyPots.objects.create(honeyPotType=potType, ThreatNum=0, status=1, IsIntranet=False)
+                port = manageForm.cleaned_data.get('port')
+                temp = models.HoneyPots.objects.create(honeyPotType=potType, port=port, ThreatNum=0, status=1,
+                                                       IsIntranet=False)
                 id = temp.honeyPotID
+                if potType == 1:
+                    sendMessage(('127.0.0.1', 20000), ';'.join(["1", str(id), port]))
+                elif potType == 2:
+                    sendMessage(('127.0.0.1', 20000), ';'.join(["4", str(id), port]))
+                elif potType == 3:
+                    pass
+                elif potType == 5:
+                    pass
+
     return redirect("/")
 
 
@@ -224,6 +235,22 @@ def delPot(request):
         manageForm = forms.managePotForm(request.POST)
         if manageForm.is_valid():
             potID = manageForm.cleaned_data.get('potID')
+            temp = models.HoneyPots.objects.filter(honeyPotID=potID).values_list("honeyPotType")
+            potType = temp[0][0]
+            if potType == 1:
+                sendMessage(('127.0.0.1', 20000), ';'.join(["2", str(potID)]))
+            elif potType == 2:
+                sendMessage(('127.0.0.1', 20000), ';'.join(["5", str(potID)]))
+            elif potType == 3:
+                pass
+            elif potType == 4:
+                sendSSHData(addr=('192.168.46.136', 20002), mode="2", id=potID)
+            elif potType == 5:
+                pass
+            elif potType == 7:
+                sendRealSSHData(('192.168.46.8', 20003), "3", str(potID))
+            else:
+                pass
             models.HoneyPots.objects.filter(honeyPotID=potID).delete()
     return redirect("/")
 
@@ -235,6 +262,37 @@ def resetPot(request):
         manageForm = forms.managePotForm(request.POST)
         if manageForm.is_valid():
             potID = manageForm.cleaned_data.get('potID')
+            temp = models.HoneyPots.objects.filter(honeyPotID=potID).values_list('honeyPotType')
+            potType = temp[0][0]
+            if potType == 1:
+                sendMessage(('127.0.0.1', 20000), ';'.join(["3", str(potID)]))
+                pot = models.HoneyPots.objects.filter(honeyPotID=potID)
+                pot.update(status=1)
+            elif potType == 2:
+                sendMessage(('127.0.0.1', 20000), ';'.join(["6", str(potID)]))
+                pot = models.HoneyPots.objects.filter(honeyPotID=potID)
+                pot.update(status=1)
+            elif potType == 3:
+                pass
+            elif potType == 4:
+                sendSSHData(addr=('192.168.46.136', 20002), mode="3", id=potID)
+                pot = models.HoneyPots.objects.filter(honeyPotID=potID)
+                pot.update(status=1)
+            elif potType == 5:
+                pass
+            elif potType == 6:
+                port = sendRealSSHData(('192.168.46.8', 20003), "1")
+                print("更新SSH地址：192.168.46.8:" + port)
+                temp = models.HoneyPots.objects.filter(honeyPotID="1")
+                temp.update(port=port)
+                temp.update(status=1)
+            elif potType == 7:
+                addr = sendRealSSHData(('192.168.46.8', 20003), "4", str(potID))
+                pot = models.HoneyPots.objects.filter(honeyPotID=potID)
+                pot.update(status=1)
+                print(addr)
+            else:
+                pass
     return redirect("/")
 
 
@@ -253,6 +311,9 @@ def mysqlHoneyPot(request):
             models.Threat.objects.create(honeyPotID=honeyPotID, honeyPotType=honeyPotType, ip=ip, origin=origin,
                                          time=now
                                          , detail=detail)
+            pot = models.HoneyPots.objects.filter(honeyPotID=honeyPotID)
+            pot.update(ThreatNum=pot[0].ThreatNum + 1)
+            pot.update(status=2)
             t = models.ThreatType.objects.filter(threatID=2)
             if t:
                 t.update(num=t[0].num + 1)
@@ -280,6 +341,9 @@ def webHoneyPot(request):
             models.Threat.objects.create(honeyPotID=honeyPotID, honeyPotType=honeyPotType, ip=ip, origin=origin,
                                          time=now
                                          , detail=detail)
+            pot = models.HoneyPots.objects.filter(honeyPotID=honeyPotID)
+            pot.update(ThreatNum=pot[0].ThreatNum + 1)
+            pot.update(status=2)
             t = models.ThreatType.objects.filter(threatID=1)
             if t:
                 t.update(num=t[0].num + 1)
@@ -291,35 +355,63 @@ def webHoneyPot(request):
     return HttpResponse()
 
 
-# mode: 1 添加 2 删除 3 重置
-def sendSSH1Data(addr, data):
-    asyKey = rsa.newkeys(2048)
-    # 公钥和私钥
-    publicKey = asyKey[0]
-    privateKey = asyKey[1]
-    # 创建socket通信对象
-    # 默认使用AF_INET协议族，即ipv4地址和端口号的组合以及tcp协议
-    clientSocket = socket.socket()
-    # 默认连接服务器地址为本机ip和8080端口
-    clientSocket.connect(addr)
+@csrf_exempt
+def rdpHoneyPot(request):
+    if request.method == 'POST':
+        RDPHoneyPotForm = forms.RDPHoneyPotForm(request.POST)
+        if RDPHoneyPotForm.is_valid():
+            ip = RDPHoneyPotForm.cleaned_data.get("ip")
+            origin = getOrigin(ip)
+            ConnectTime = RDPHoneyPotForm.cleaned_data.get("ConnectTime")
+            DisconnectTime = RDPHoneyPotForm.cleaned_data.get("DisconnectTime")
+            FileName = RDPHoneyPotForm.cleaned_data.get("fileName")
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            detail = "IP：" + ip + "尝试连接RDP" + "开始连接时间为：" + ConnectTime + "断开连接时间为: " + DisconnectTime + "视频文件下载链接：" + "http://127.0.0.1/download?file=" + FileName
+            models.Threat.objects.create(honeyPotID=2, honeyPotType=5, ip=ip, origin=origin,
+                                         time=now
+                                         , detail=detail)
+            pot = models.HoneyPots.objects.filter(honeyPotID=2)
+            pot.update(ThreatNum=pot[0].ThreatNum + 1)
+            pot.update(status=2)
+            t = models.ThreatType.objects.filter(threatID=1)
+            if t:
+                t.update(num=t[0].num + 1)
+            tip = models.ThreatIP.objects.filter(ip=ip)
+            if tip.exists():
+                tip.update(num=tip[0].num + 1)
+            else:
+                models.ThreatIP.objects.create(ip=ip, origin=origin, num=1)
+        else:
+            RDPHoneyPotConnectForm = forms.RDPHoneyPotConnectForm(request.POST)
+            if RDPHoneyPotConnectForm.is_valid():
+                ip = RDPHoneyPotConnectForm.cleaned_data.get("ip")
+                origin = getOrigin(ip)
+                ConnectTime = RDPHoneyPotConnectForm.cleaned_data.get("ConnectTime")
+                DisconnectTime = RDPHoneyPotConnectForm.cleaned_data.get("DisconnectTime")
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                detail = "IP：" + ip + "尝试连接RDP" + "开始连接时间为：" + ConnectTime + "断开连接时间为: " + DisconnectTime
+                models.Threat.objects.create(honeyPotID=2, honeyPotType=5, ip=ip, origin=origin,
+                                             time=now
+                                             , detail=detail)
+                pot = models.HoneyPots.objects.filter(honeyPotID=2)
+                pot.update(ThreatNum=pot[0].ThreatNum + 1)
+                pot.update(status=2)
+                t = models.ThreatType.objects.filter(threatID=1)
+                if t:
+                    t.update(num=t[0].num + 1)
+                tip = models.ThreatIP.objects.filter(ip=ip)
+                if tip.exists():
+                    tip.update(num=tip[0].num + 1)
+                else:
+                    models.ThreatIP.objects.create(ip=ip, origin=origin, num=1)
+    return HttpResponse()
 
-    # 向服务器传递公钥，和该公钥字符串化后的sha256值
-    print("正在向服务器传送公钥")
-    sendKey = pickle.dumps(publicKey)
-    sendKeySha256 = hashlib.sha256(sendKey).hexdigest()
-    clientSocket.send(pickle.dumps((sendKey, sendKeySha256)))
 
-    # 接受服务器传递的密钥并进行解密
-    symKey, symKeySha256 = pickle.loads(clientSocket.recv(1024))
-    if hashlib.sha256(symKey).hexdigest() != symKeySha256:
-        print("error")
-    else:
-        print("密钥交换完成")
-        symKey = pickle.loads(rsa.decrypt(symKey, privateKey))
-    # 初始化加密对象
-    f = Fernet(symKey)
-    en_sendData = f.encrypt(data.encode())
-    clientSocket.send(en_sendData)
-    en_recvData = clientSocket.recv(1024)
-    recvData = f.decrypt(en_recvData).decode()
-    print("接受到服务器传来的消息：{0}".format(recvData))
+def download(request):
+    if request.method == "GET":
+        filename = request.GET.get("file")
+        file = open('file/' + filename, 'rb')
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="' + filename + '"'
+        return response

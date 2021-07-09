@@ -1,5 +1,6 @@
 import requests
 from django.shortcuts import render
+import socket
 from . import forms
 
 
@@ -19,11 +20,10 @@ def login(request):
             username = UserLoginForm.cleaned_data.get('username')
             password = UserLoginForm.cleaned_data.get('password')
             ip = get_ip(request)
-            print(ip)
-            url = 'http://10.22.145.106/webHoneyPot/'
-            data = {'ip': ip, 'username': username, 'password': password, 'potID': 1}
-            r = requests.post(url, data)
-            print(r.status_code)
+            url = 'http://10.21.196.121/webHoneyPot/'
+            potID = socket.gethostname().split("Web")[1]
+            data = {'ip': ip, 'username': username, 'password': password, 'potID': potID}
+            requests.post(url, data)
         message = "账户或密码错误！"
         return render(request, "index.html", {'message': message})
     else:

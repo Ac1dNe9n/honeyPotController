@@ -29,8 +29,11 @@ urlpatterns = [
     path('about/', v.about),
     path('webHoneyPot/', v.webHoneyPot),
     path('mysqlHoneyPot/', v.mysqlHoneyPot),
+    path('rdpHoneyPot/',v.rdpHoneyPot),
     path('reset/', v.resetPot),
+    path('resetSSH/', v.resetPot),
     path('del/', v.delPot),
     path('addOut/', v.addOutPot),
-    path('addIn/',v.addInPot),
+    path('addIn/', v.addInPot),
+    path('download/',v.download),
 ]

